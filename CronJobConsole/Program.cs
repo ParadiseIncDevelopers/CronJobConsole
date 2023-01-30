@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace CronJobConsole
 {
@@ -29,6 +30,7 @@ namespace CronJobConsole
                     lines[index].LastRequest = DateTime.Now;
                     string allLines = JsonSerializer.Serialize(lines, options);
                     System.IO.File.WriteAllLines(Path, new List<string> { allLines });
+                    Console.WriteLine("{0} => {1}:{2}:{3}", Lines[index].Description, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
                 }
                 else
                 {
@@ -119,7 +121,6 @@ namespace CronJobConsole
 
             try
             {
-                Console.WriteLine("{0} => {1}:{2}:{3}", Lines[theIndex].Description, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
                 var tok = TokenGetter(theIndex, Lines[theIndex].AppSecretKey, Lines[theIndex].RestaurantSecretKey);
                 ApiRequester(theIndex, Lines[theIndex].OrderPostUrl, tok);
                 WriteLastSeen(theIndex);
@@ -200,7 +201,8 @@ namespace CronJobConsole
 
                 string? response = HttpClient.SendAsync(request).Result.Content.ReadAsStringAsync().Result;
 
-                if (Lines?.Count == 0 || Lines == null)
+                JsonArray arr = JsonObject.Parse(response).AsArray();
+                if (arr?.Count == 0 || arr == null)
                 {
                     return;
                 }
@@ -218,6 +220,12 @@ namespace CronJobConsole
                 request.Headers.TryAddWithoutValidation("x-executor-user", "test");
 
                 var response = httpClient.SendAsync(request).Result.Content.ReadAsStringAsync().Result;
+
+                JsonObject arr = JsonObject.Parse(response).AsObject();
+                if (arr?.Count == 0 || arr == null)
+                {
+                    return;
+                }
 
                 StringContent? payload = new(response, Encoding.UTF8, "application/x-www-form-urlencoded");
                 string? newToken = HttpClient.PostAsync(postApi, payload).Result.Content.ReadAsStringAsync().Result;
