@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 
-namespace ApiDeneme
+namespace CronJobConsole
 {
     public class Program
     {
