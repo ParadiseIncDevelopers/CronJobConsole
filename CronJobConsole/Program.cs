@@ -1,5 +1,4 @@
-﻿using CronJobConsole;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 
 namespace ApiDeneme
@@ -89,7 +88,7 @@ namespace ApiDeneme
         {
             get
             {
-                return Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\" + "CronJob" + "\\" + "db.json";
+                return "C:" + "\\" + "CronJob" + "\\" + "db.json";
             }
         }
 
